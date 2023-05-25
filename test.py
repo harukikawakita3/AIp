@@ -102,4 +102,19 @@
 
 # print(device)
 
+import youtube_dl
 
+video_id = 'Vt_nc9pZnqs'
+
+ydl_opts = {
+    'format': 'bestaudio/best',
+    'outtmpl': '{}.mp3'.format(video_id),
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'mp3',
+        'preferredquality': '192'
+    }]
+}
+
+with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+    ydl.download(['http://www.youtube.com/watch?v=' + video_id])
