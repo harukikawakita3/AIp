@@ -39,6 +39,7 @@
 # testloader = torch.utils.data.DataLoader(testset, batch_size=64, shuffle=False)
 
 # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 # class Net(nn.Module):
 #     def __init__(self):
 #         super(Net, self).__init__()
@@ -101,3 +102,119 @@
 
 
 # print(device)
+
+# NN
+
+# import tensorflow as tf
+# from tensorflow import keras
+
+# # データセットの読み込み
+# mnist = keras.datasets.mnist
+# (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
+
+# # 前処理
+# train_images = train_images / 255.0
+# test_images = test_images / 255.0
+
+# # モデルの構築
+# model = keras.Sequential([
+#     keras.layers.Flatten(input_shape=(28, 28)),
+#     keras.layers.Dense(128, activation='relu'),
+#     keras.layers.Dense(64, activation='relu'),
+#     keras.layers.Dense(10, activation='softmax')
+# ])
+
+# # モデルのコンパイル
+# model.compile(optimizer='adam',
+#               loss='sparse_categorical_crossentropy',
+#               metrics=['accuracy'])
+
+# # 学習
+# model.fit(train_images, train_labels, epochs=10)
+
+# # 評価
+# test_loss, test_acc = model.evaluate(test_images, test_labels)
+# print('Test accuracy:', test_acc)
+
+# import tensorflow as tf
+# from tensorflow import keras
+
+# mnist = keras.datasets.mnist
+# (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
+
+# train_images = train_images / 255.0
+# test_images = test_images / 255.0
+
+# model = keras.Sequential([
+#     keras.layers.Flatten(input_shape=(28, 28)),
+#     keras.layers.Dense(128, activation='relu'),
+#     keras.layers.Dense(64, activation='relu'),
+#     keras.layers.Dense(10, activation='softmax')
+# ])
+
+# model.compile(optimizer='adam',
+#               loss='sparse_categorical_crossentropy',
+#               metrics=['accuracy'])
+
+# model.fit(train_images, train_labels, epochs=10)
+
+# test_loss, test_acc = model.evaluate(test_images, test_labels)
+# print('test accuracy:', test_acc)
+
+# import tensorflow as tf
+# from tensorflow import keras
+# from PIL import Image
+# import numpy as np
+
+# # Load the image
+# image = Image.open('path_to_your_image.png').convert('L')
+
+# # Resize the image
+# image = image.resize((28, 28))
+
+# # Convert the image to a NumPy array
+# image = np.array(image)
+
+# # Normalize the image
+# image = image / 255.0
+
+# # Add an extra dimension
+# image = np.expand_dims(image, axis=0)
+
+# # Load and prepare the MNIST dataset
+# mnist = keras.datasets.mnist
+# (train_images, train_labels), (image, label) = mnist.load_data()
+
+# # Normalize the images
+# train_images = train_images / 255.0
+# image = image / 255.0
+
+# # Define the model
+# model = keras.Sequential([
+#     keras.layers.Flatten(input_shape=(28, 28)),
+#     keras.layers.Dense(128, activation='relu'),
+#     keras.layers.Dense(64, activation='relu'),
+#     keras.layers.Dense(10, activation='softmax')
+# ])
+
+# # Compile the model
+# model.compile(optimizer='adam',
+#               loss='sparse_categorical_crossentropy',
+#               metrics=['accuracy'])
+
+# # Train the model
+# model.fit(train_images, train_labels, epochs=10)
+
+# # Evaluate the model
+# test_loss, test_acc = model.evaluate(image, label)
+# print('Test accuracy:', test_acc)
+
+
+
+# # Predict the digit in the image
+# prediction = model.predict(image)
+# predicted_digit = np.argmax(prediction)
+
+# print('Predicted digit:', predicted_digit)
+
+
