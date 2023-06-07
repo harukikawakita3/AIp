@@ -161,60 +161,91 @@
 # test_loss, test_acc = model.evaluate(test_images, test_labels)
 # print('test accuracy:', test_acc)
 
-# import tensorflow as tf
-# from tensorflow import keras
-# from PIL import Image
-# import numpy as np
+# 1915
+import torch
+import torchvision
+import torchvision.transforms as transforms
+import torch.nn as nn
+import torch.optim as optim
 
-# # Load the image
-# image = Image.open('path_to_your_image.png').convert('L')
+# ネットワークを定義
+class Net(nn.Module):
+    def __init__(self):
+        super(Net, self).__init__()
+        self.fc1 = nn.Linear(28 * 28, 128)
+        self.fc2 = nn.Linear(128, 64)
+        self.fc3 = nn.Linear(64, 10)
 
-# # Resize the image
-# image = image.resize((28, 28))
+    def forward(self, x):
+        x = x.view(-1, 28 * 28)
+        x = torch.relu(self.fc1(x))
+        x = torch.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
 
-# # Convert the image to a NumPy array
-# image = np.array(image)
+def main():
+    # データの前処理を定義
+    transform = transforms.Compose(
+        [transforms.ToTensor(),
+         transforms.Normalize((0.5,), (0.5,))])
 
-# # Normalize the image
-# image = image / 255.0
+    # MNISTデータセットをダウンロード
+    trainset = torchvision.datasets.MNIST(root='./data', train=True,
+                                          download=True, transform=transform)
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=64,
+                                              shuffle=True, num_workers=8)
 
-# # Add an extra dimension
-# image = np.expand_dims(image, axis=0)
+    testset = torchvision.datasets.MNIST(root='./data', train=False,
+                                         download=True, transform=transform)
+    testloader = torch.utils.data.DataLoader(testset, batch_size=64,
+                                             shuffle=False, num_workers=8)
 
-# # Load and prepare the MNIST dataset
-# mnist = keras.datasets.mnist
-# (train_images, train_labels), (image, label) = mnist.load_data()
+    net = Net()
 
-# # Normalize the images
-# train_images = train_images / 255.0
-# image = image / 255.0
+    # 損失関数と最適化手法を定義
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
-# # Define the model
-# model = keras.Sequential([
-#     keras.layers.Flatten(input_shape=(28, 28)),
-#     keras.layers.Dense(128, activation='relu'),
-#     keras.layers.Dense(64, activation='relu'),
-#     keras.layers.Dense(10, activation='softmax')
-# ])
+    # ネットワークを訓練
+    for epoch in range(10):  # データセットを複数回(2回)通過
 
-# # Compile the model
-# model.compile(optimizer='adam',
-#               loss='sparse_categorical_crossentropy',
-#               metrics=['accuracy'])
+        running_loss = 0.0
+        for i, data in enumerate(trainloader, 0):
+            # 入力を取得
+            inputs, labels = data
 
-# # Train the model
-# model.fit(train_images, train_labels, epochs=10)
+            # 勾配を0に初期化
+            optimizer.zero_grad()
 
-# # Evaluate the model
-# test_loss, test_acc = model.evaluate(image, label)
-# print('Test accuracy:', test_acc)
+            # forward + backward + optimize
+            outputs = net(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
 
-
-
-# # Predict the digit in the image
-# prediction = model.predict(image)
-# predicted_digit = np.argmax(prediction)
-
-# print('Predicted digit:', predicted_digit)
+            # 統計を表示
+            running_loss += loss.item()
+            # if i % 2000 == 1999:    # 2000ミニバッチごとに表示
+            print('[%d, %5d] loss: %.3f' %
+                      (epoch + 1, i + 1, running_loss / 2000))
+            running_loss = 0.0
 
 
+    print('Finished Training')
+
+    correct = 0
+    total = 0
+
+    with torch.no_grad():
+        for data in testloader:
+            images, labels = data
+            outputs = net(images)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+
+    print('Accuracy of the network on the 10000 test images: %d %%' % (
+        100 * correct / total))
+
+if __name__ == '__main__':
+    main()
